@@ -319,8 +319,8 @@ brew install python@3.10
 
 ```bash
 # 1. Clone and setup
-git clone https://github.com/MAOFILHO/Reinforcement-Learning/tree/main/Azure-ML-RLlib-PPO-Pipeline.git
-cd Azure-ML-RLlib-PPO-Pipeline
+git clone https://github.com/MAOFILHO/Reinforcement-Learning.git
+cd Reinforcement-Learning/Azure-ML-RLlib-PPO-Pipeline
 make setup PYTHON=/opt/homebrew/bin/python3.10
 ```
 
