@@ -194,6 +194,38 @@ flowchart LR
 
 ---
 
+## Project Structure
+
+```
+plato-rl-azure/
+├── src/plato_rl/           # Main Python package
+│   ├── cli.py              # Click CLI with all 11 step commands
+│   ├── config.py           # .env configuration loading
+│   ├── console.py          # Rich terminal output helpers
+│   ├── azure/              # Azure CLI orchestration
+│   │   ├── auth.py         # Login and subscription management
+│   │   ├── provision.py    # Idempotent resource creation
+│   │   ├── jobs.py         # Job submission, polling, downloads
+│   │   ├── teardown.py     # Resource deletion with verification
+│   │   └── cli_runner.py   # az CLI subprocess wrapper with retry
+│   ├── training/           # Training step implementations
+│   ├── observability/      # Trajectory and curriculum callbacks
+│   ├── assessment/         # Custom episode evaluation
+│   ├── deploy/             # AML endpoint deployment
+│   ├── sims/               # Gymnasium simulation environments
+│   ├── platotk/            # Vendored RL utilities (serialize, restore)
+│   └── templates/          # Jinja2 templates for AML YAML files
+├── aml_src/                # Source code uploaded to Azure ML compute
+├── tests/                  # Unit tests (mocked Azure, real RL)
+├── Makefile                # Common operations
+├── .env.example            # Configuration template
+└── README.md               # This file
+```
+
+
+
+---
+
 ## Reinforcement Learning Primer
 
 If you're new to RL, here's what each concept means in the context of this project:
@@ -228,30 +260,22 @@ If you're new to RL, here's what each concept means in the context of this proje
 
 ---
 
-## Quick Start
+## Configuration Reference
 
-```bash
-# 1. Clone and setup
-git clone https://github.com/your-username/plato-rl-azure.git
-cd plato-rl-azure
-make setup
+All settings are in `.env` (copy from `.env.example`):
 
-# 2. Configure Azure (edit .env with your subscription ID)
-cp .env.example .env
-# Edit .env → set AZURE_SUBSCRIPTION_ID
-
-# 3. Activate and verify
-source .venv/bin/activate
-plato check
-
-# 4. Run local smoke test (no Azure needed)
-plato smoke-test
-
-# 5. Run full Azure pipeline
-plato provision      # Create Azure resources
-plato train          # Train on Azure ML
-plato teardown       # Clean up when done
-```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `AZURE_SUBSCRIPTION_ID` | (required) | Your Azure subscription ID |
+| `AZURE_RESOURCE_GROUP` | `plato-rl-rg` | Resource group name |
+| `AZURE_LOCATION` | `eastus` | Azure region |
+| `AZURE_WORKSPACE_NAME` | `plato-rl-ws` | AML workspace name |
+| `AZURE_COMPUTE_NAME` | `plato-compute` | Compute cluster name |
+| `AZURE_COMPUTE_VM_SIZE` | `Standard_D4s_v3` | VM size (4 CPU, 16GB) |
+| `AZURE_COMPUTE_MIN_NODES` | `0` | Min nodes (0 = deallocate when idle) |
+| `AZURE_COMPUTE_MAX_NODES` | `2` | Max nodes for scaling |
+| `TRAINING_ITERATIONS` | `10` | PPO training iterations |
+| `NUM_TUNE_SAMPLES` | `10` | Hyperparameter search samples |
 
 ---
 
@@ -266,6 +290,60 @@ plato teardown       # Clean up when done
 
 **No Docker required.** The entire deployment is via Azure ML managed endpoints.
 
+
+---
+
+
+## Quick Start
+
+```bash
+# 1. Clone and setup
+git clone https://github.com/MAOFILHO/Reinforcement-Learning/tree/main/Azure-ML-RLlib-PPO-Pipeline.git
+cd Azure-ML-RLlib-PPO-Pipeline
+make setup
+```
+
+
+```bash
+# 2. Configure Azure (edit .env with your subscription ID)
+cp .env.example .env
+# Edit .env → set AZURE_SUBSCRIPTION_ID
+```
+
+
+<img width="951" height="695" alt="Screenshot 2026-06-23 at 5 34 34 PM" src="https://github.com/user-attachments/assets/dad11472-1210-4614-9172-45a235098cda" />
+
+
+
+```bash
+# 3. Activate and verify
+source .venv/bin/activate
+plato check
+```
+<img width="928" height="294" alt="Screenshot 2026-06-23 at 5 38 42 PM" src="https://github.com/user-attachments/assets/37f33ed7-d75c-4d51-9588-aeaefff5b619" />
+
+```bash
+# 4. Run local smoke test (no Azure needed)
+plato smoke-test
+```
+
+<img width="929" height="726" alt="Screenshot 2026-06-23 at 5 56 05 PM" src="https://github.com/user-attachments/assets/e50d7ee3-641a-4e3a-b0f2-c06bf6e4c1f5" />
+
+
+```bash
+# 5. Run full Azure pipeline
+plato provision      # Create Azure resources
+plato train          # Train on Azure ML
+plato teardown       # Clean up when done
+```
+
+<img width="930" height="441" alt="Screenshot 2026-06-23 at 5 55 06 PM" src="https://github.com/user-attachments/assets/b18779d6-e554-4502-8c14-200c6aca8851" />
+
+<img width="929" height="416" alt="Screenshot 2026-06-23 at 6 51 34 PM" src="https://github.com/user-attachments/assets/0a34430b-8f37-4ff8-a7cd-fb0911912654" />
+
+<img width="976" height="788" alt="Screenshot 2026-06-23 at 8 52 03 PM" src="https://github.com/user-attachments/assets/a6e8af6c-b5ac-4213-b235-bbf0043ff75f" />
+
+
 ---
 
 ## Step-by-Step Guide
@@ -275,6 +353,10 @@ plato teardown       # Clean up when done
 plato check
 ```
 Verifies Python version, Azure CLI installation, `az ml` extension, and `.env` configuration. Automatically installs the ML extension if missing.
+
+
+<img width="928" height="294" alt="Screenshot 2026-06-23 at 5 38 42 PM" src="https://github.com/user-attachments/assets/8c58d87e-c100-498f-971f-b9bac5057c09" />
+
 
 ### Step 1: Provision Azure Resources
 ```bash
@@ -286,11 +368,21 @@ Creates (idempotent — safe to re-run):
 - **Compute Cluster** (`plato-compute`) — Standard_D4s_v3, scales 0-2 nodes
 - **Conda Environment** (`plato-rl-env`) — Ray 2.5.0, PyTorch, Gymnasium
 
+
+<img width="930" height="441" alt="Screenshot 2026-06-23 at 5 55 06 PM" src="https://github.com/user-attachments/assets/3046e936-3f1f-4720-a644-d64f6bed44bb" />
+
+
+
 ### Step 3: Local Smoke Test
 ```bash
 plato smoke-test
 ```
 Trains a PPO agent on SimpleAdder locally for 5 iterations (~30 seconds). Validates the entire RL stack works before spending money on Azure.
+
+
+<img width="929" height="726" alt="Screenshot 2026-06-23 at 5 56 05 PM" src="https://github.com/user-attachments/assets/c8fd7900-8283-45f0-b35f-2d45e4e39879" />
+
+
 
 ### Steps 4-8: Azure ML Training Pipeline
 ```bash
@@ -300,13 +392,27 @@ plato hpt            # Hyperparameter tuning with MLflow
 plato trajectories   # Dedicated trajectory logging
 plato assess         # Custom assessment on trained agent
 ```
-
 Each step submits a job to Azure ML, polls until completion, and downloads outputs.
+
+<img width="929" height="416" alt="Screenshot 2026-06-23 at 6 51 34 PM" src="https://github.com/user-attachments/assets/500e9959-ed78-47cd-8c43-7c64e94fbda9" />
+
+<img width="925" height="427" alt="Screenshot 2026-06-23 at 7 01 11 PM" src="https://github.com/user-attachments/assets/664902aa-03c3-443b-a5ec-bbeb6639fda6" />
+
+<img width="928" height="485" alt="Screenshot 2026-06-23 at 7 25 25 PM" src="https://github.com/user-attachments/assets/4c5d5e4e-2234-46aa-9a66-e37faa9dc29d" />
+
+<img width="968" height="427" alt="Screenshot 2026-06-23 at 7 39 22 PM" src="https://github.com/user-attachments/assets/cda85fcf-6a12-4951-bca9-d8871bb46017" />
+
+<img width="971" height="448" alt="Screenshot 2026-06-23 at 8 10 27 PM" src="https://github.com/user-attachments/assets/65f05d05-60be-43a5-8323-1deaebb1951f" />
+
 
 ### Step 9: Deploy Agent
 ```bash
 plato deploy --checkpoint ./outputs/basic
 ```
+
+<img width="967" height="439" alt="Screenshot 2026-06-23 at 8 29 19 PM" src="https://github.com/user-attachments/assets/dfbb77a1-b74e-42d2-a7f7-35b2d9839727" />
+
+
 Registers the trained model, creates an AML-managed endpoint, deploys, and tests:
 ```bash
 curl --request POST \
@@ -329,6 +435,8 @@ plato teardown
 7. Reports: "All resources deleted. Zero charges."
 
 Use `--force` to skip confirmation: `plato teardown --force`
+
+<img width="972" height="671" alt="Screenshot 2026-06-23 at 8 40 05 PM" src="https://github.com/user-attachments/assets/e10eeade-bb7f-4026-ad6a-d6bc63191b5f" />
 
 ---
 
@@ -396,55 +504,6 @@ best_run = mlflow.search_runs(
     max_results=1,
 )
 print(f"Best run: {best_run.iloc[0]['run_id']}")
-```
-
----
-
-## Configuration Reference
-
-All settings are in `.env` (copy from `.env.example`):
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `AZURE_SUBSCRIPTION_ID` | (required) | Your Azure subscription ID |
-| `AZURE_RESOURCE_GROUP` | `plato-rl-rg` | Resource group name |
-| `AZURE_LOCATION` | `eastus` | Azure region |
-| `AZURE_WORKSPACE_NAME` | `plato-rl-ws` | AML workspace name |
-| `AZURE_COMPUTE_NAME` | `plato-compute` | Compute cluster name |
-| `AZURE_COMPUTE_VM_SIZE` | `Standard_D4s_v3` | VM size (4 CPU, 16GB) |
-| `AZURE_COMPUTE_MIN_NODES` | `0` | Min nodes (0 = deallocate when idle) |
-| `AZURE_COMPUTE_MAX_NODES` | `2` | Max nodes for scaling |
-| `TRAINING_ITERATIONS` | `10` | PPO training iterations |
-| `NUM_TUNE_SAMPLES` | `10` | Hyperparameter search samples |
-
----
-
-## Project Structure
-
-```
-plato-rl-azure/
-├── src/plato_rl/           # Main Python package
-│   ├── cli.py              # Click CLI with all 11 step commands
-│   ├── config.py           # .env configuration loading
-│   ├── console.py          # Rich terminal output helpers
-│   ├── azure/              # Azure CLI orchestration
-│   │   ├── auth.py         # Login and subscription management
-│   │   ├── provision.py    # Idempotent resource creation
-│   │   ├── jobs.py         # Job submission, polling, downloads
-│   │   ├── teardown.py     # Resource deletion with verification
-│   │   └── cli_runner.py   # az CLI subprocess wrapper with retry
-│   ├── training/           # Training step implementations
-│   ├── observability/      # Trajectory and curriculum callbacks
-│   ├── assessment/         # Custom episode evaluation
-│   ├── deploy/             # AML endpoint deployment
-│   ├── sims/               # Gymnasium simulation environments
-│   ├── platotk/            # Vendored RL utilities (serialize, restore)
-│   └── templates/          # Jinja2 templates for AML YAML files
-├── aml_src/                # Source code uploaded to Azure ML compute
-├── tests/                  # Unit tests (mocked Azure, real RL)
-├── Makefile                # Common operations
-├── .env.example            # Configuration template
-└── README.md               # This file
 ```
 
 ---
