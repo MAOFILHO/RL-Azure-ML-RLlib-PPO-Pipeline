@@ -1,6 +1,6 @@
-# Plato RL Azure
+# Production Reinforcement Learning on Azure ML: PPO + Ray RLlib, End-to-End
 
-**Production-grade Reinforcement Learning pipeline on Azure ML — from local training to cloud deployment in one command.**
+**Train, tune, and deploy an RL agent to a managed Azure ML endpoint — provisioning to teardown in a single CLI.**
 
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![Azure ML](https://img.shields.io/badge/Azure-Machine%20Learning-0078D4)](https://azure.microsoft.com/en-us/products/machine-learning)
@@ -200,18 +200,18 @@ If you're new to RL, here's what each concept means in the context of this proje
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                    ENVIRONMENT                       │
-│              (SimpleAdder Simulation)                │
-│                                                      │
+│                    ENVIRONMENT                      │
+│              (SimpleAdder Simulation)               │
+│                                                     │
 │   State: current value (e.g., 23)                   │
 │   Goal:  reach value = 50                           │
-│                                                      │
-│         ┌──────────┐    action     ┌──────────┐     │
-│         │          │──(addend=+5)──▶│          │     │
-│         │  AGENT   │               │   SIM    │     │
-│         │  (PPO)   │◀──(reward,───│  (Adder) │     │
-│         │          │   new state)  │          │     │
-│         └──────────┘               └──────────┘     │
+│                                                     │
+│         ┌──────────┐    action      ┌──────────┐    │
+│         │          │──(addend=+5)──▶│          │    │
+│         │  AGENT   │                │   SIM    │    │
+│         │  (PPO)   │◀──(reward,──--─│  (Adder) │    │
+│         │          │   new state)   │          │    │
+│         └──────────┘                └──────────┘    │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -264,7 +264,7 @@ plato teardown       # Clean up when done
 | **Azure ML extension** | Latest | `az extension add -n ml` (auto-installed by `plato check`) |
 | **Azure subscription** | Active | [Free trial](https://azure.microsoft.com/en-us/free/) |
 
-**No Docker required.** All deployment is via Azure ML managed endpoints.
+**No Docker required.** The entire deployment is via Azure ML managed endpoints.
 
 ---
 
@@ -307,7 +307,7 @@ Each step submits a job to Azure ML, polls until completion, and downloads outpu
 ```bash
 plato deploy --checkpoint ./outputs/basic
 ```
-Registers the trained model, creates an AML managed endpoint, deploys, and tests:
+Registers the trained model, creates an AML-managed endpoint, deploys, and tests:
 ```bash
 curl --request POST \
   --header "Authorization: Bearer $TOKEN" \
@@ -321,7 +321,7 @@ curl --request POST \
 plato teardown
 ```
 1. Lists all resources in the resource group
-2. Shows inventory table
+2. Shows the inventory table
 3. Asks for confirmation (type resource group name)
 4. Deletes the entire resource group
 5. Verifies deletion completed
@@ -371,8 +371,8 @@ Each trial logs:
 3. Find the `plato-hyperparameter-tuning` experiment
 4. Click **Include child jobs** to see individual tuning trials
 5. Use filters to find top performers:
-   - Sort by `episode_reward_mean` (highest) to find best models
-   - Filter by `training_iteration` to see most-trained agents
+   - Sort by `episode_reward_mean` (highest) to find the best models
+   - Filter by `training_iteration` to see the most-trained agents
    - Filter by job status to find completed runs
 
 ### Custom Charts
@@ -475,7 +475,7 @@ plato-rl-azure/
 
 | Problem | Solution |
 |---------|----------|
-| `Soft-deleted workspace exists` | Azure keeps deleted workspaces in soft-delete for 14 days. The `forcePurge` REST API is unreliable. **Fix:** change `AZURE_WORKSPACE_NAME` in `.env` to a new name (e.g., `plato-rl-ws2`). The provision script attempts purge automatically but may not succeed. |
+| `Soft-deleted workspace exists` | Azure keeps deleted workspaces in soft-delete for 14 days. The `forcePurge` REST API is unreliable. **Fix:** change `AZURE_WORKSPACE_NAME` in `.env` to a new name (e.g., `plato-rl-ws2`). The provision script attempts to purge automatically, but may not succeed. |
 | `Compute nodes not starting` | With min_nodes=0, first job waits 5-10 min for scale-up. This is normal. |
 | `MPI multi-node jobs fail silently` | Jobs with `instance_count: 2` may fail at "Starting" with no logs when the cluster can't provision both nodes simultaneously. **Fix:** use `instance_count: 1` for Ray Tune jobs — Tune parallelizes trials on a single node via multiple CPUs. |
 
