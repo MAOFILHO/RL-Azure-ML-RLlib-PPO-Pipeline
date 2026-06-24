@@ -1,6 +1,6 @@
 # Production Reinforcement Learning on Azure ML: PPO + Ray RLlib, End-to-End
 
-**Train, tune, and deploy an RL agent to a managed Azure ML endpoint — provisioning to teardown in a single CLI.**
+**Train, tune, and deploy an RL agent to a managed Azure ML endpoint — from provisioning to teardown in a single CLI.**
 
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![Azure ML](https://img.shields.io/badge/Azure-Machine%20Learning-0078D4)](https://azure.microsoft.com/en-us/products/machine-learning)
