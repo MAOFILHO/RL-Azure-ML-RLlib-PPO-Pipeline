@@ -39,13 +39,13 @@ RL at scale on cloud infrastructure delivers measurable business outcomes:
 
 | Industry | Application | RL Method | Result | Source |
 |----------|------------|-----------|--------|--------|
-| **Energy / HVAC** | Building climate control | Deep RL controllers | **27–30% energy reduction** vs. rule-based, **39.6% cost savings** | Springer Nature, Cambridge University |
-| **Supply Chain** | Inventory optimization | PPO policy | **9.1% cost reduction**, **46.7% emission reduction** | ASML / Informs M&SOM |
-| **Financial Services** | Dynamic hedging | RL risk management | **18% credit risk reduction** during market stress | Industry case study |
-| **Manufacturing** | Autonomous robotics | Hierarchical DRL | **45x faster training** than DeepMind baseline | Microsoft Project Bonsai |
-| **Logistics** | Spare parts network | Deep Q-Learning | **Outperformed all existing heuristics** | ASML production deployment |
-| **Retail** | Demand forecasting | Multi-agent RL | **15–25% inventory cost reduction** | McKinsey Global Institute |
-| **Telecom** | Network optimization | PPO + multi-agent | **30% improvement** in resource allocation | Ericsson Research |
+| ⚡ **Energy/HVAC** | Building climate control | Deep RL controllers | **27–30% energy reduction** vs. rule-based, **39.6% cost savings** | Springer Nature, Cambridge University |
+| 📦 **Supply Chain** | Inventory optimization | PPO policy | **9.1% cost reduction**, **46.7% emission reduction** | ASML / Informs M&SOM |
+| 💰 **Financial Services** | Dynamic hedging | RL risk management | **18% credit risk reduction** during market stress | Industry case study |
+| 🏭 **Manufacturing** | Autonomous robotics | Hierarchical DRL | **45x faster training** than DeepMind baseline | Microsoft Project Bonsai |
+| 🚚 **Logistics** | Spare parts network | Deep Q-Learning | **Outperformed all existing heuristics** | ASML production deployment |
+| 🛍️ **Retail** | Demand forecasting | Multi-agent RL | **15–25% inventory cost reduction** | McKinsey Global Institute |
+| 📡 **Telecom** | Network optimization | PPO + multi-agent | **30% improvement** in resource allocation | Ericsson Research |
 
 > **Scale advantage**: A single Ray RLlib training job parallelizes across hundreds of CPUs, compressing years of simulated experience into hours of compute time.
 
