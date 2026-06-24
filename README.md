@@ -277,6 +277,10 @@ All settings are in `.env` (copy from `.env.example`):
 | `TRAINING_ITERATIONS` | `10` | PPO training iterations |
 | `NUM_TUNE_SAMPLES` | `10` | Hyperparameter search samples |
 
+
+<img width="951" height="695" alt="Screenshot 2026-06-23 at 5 34 34 PM" src="https://github.com/user-attachments/assets/2a4e5147-4710-4236-9131-942bcb838c0e" />
+
+
 ---
 
 ## Prerequisites
@@ -290,18 +294,37 @@ All settings are in `.env` (copy from `.env.example`):
 
 **No Docker required.** The entire deployment is via Azure ML managed endpoints.
 
+This project requires **Python 3.10** — Ray 2.5.0, numpy 1.24.3, and
+gymnasium 0.26.3 only ship wheels for 3.10. On 3.11+ the install fails
+while trying to compile numpy from source.
+
+```bash
+# 1. Install Python 3.10
+brew install python@3.10
+```
+
+```bash
+# 2. Verify it's available
+/opt/homebrew/bin/python3.10 --version   # should print 3.10.x
+```
+
+<img width="901" height="31" alt="Screenshot 2026-06-24 at 1 05 41 PM" src="https://github.com/user-attachments/assets/d56824d1-8a79-4bdd-a293-8b5310c035d6" />
+
 
 ---
 
 
 ## Quick Start
 
+
 ```bash
 # 1. Clone and setup
 git clone https://github.com/MAOFILHO/Reinforcement-Learning/tree/main/Azure-ML-RLlib-PPO-Pipeline.git
 cd Azure-ML-RLlib-PPO-Pipeline
-make setup
+make setup PYTHON=/opt/homebrew/bin/python3.10
 ```
+
+<img width="941" height="748" alt="Screenshot 2026-06-24 at 1 06 07 PM" src="https://github.com/user-attachments/assets/a98a9a9d-53c5-49d6-b5cd-251840ae0090" />
 
 
 ```bash
@@ -310,9 +333,7 @@ cp .env.example .env
 # Edit .env → set AZURE_SUBSCRIPTION_ID
 ```
 
-
 <img width="951" height="695" alt="Screenshot 2026-06-23 at 5 34 34 PM" src="https://github.com/user-attachments/assets/dad11472-1210-4614-9172-45a235098cda" />
-
 
 
 ```bash
@@ -320,6 +341,8 @@ cp .env.example .env
 source .venv/bin/activate
 plato check
 ```
+<img width="904" height="47" alt="Screenshot 2026-06-24 at 1 14 35 PM" src="https://github.com/user-attachments/assets/cde83368-083c-4e74-87e0-e48f82cd64a3" />
+
 <img width="928" height="294" alt="Screenshot 2026-06-23 at 5 38 42 PM" src="https://github.com/user-attachments/assets/37f33ed7-d75c-4d51-9588-aeaefff5b619" />
 
 ```bash
