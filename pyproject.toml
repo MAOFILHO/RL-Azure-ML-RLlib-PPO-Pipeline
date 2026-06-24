@@ -1,0 +1,50 @@
+[project]
+name = "plato-rl-azure"
+version = "1.0.0"
+description = "Production-grade RL training and deployment pipeline on Azure ML using Ray RLlib"
+readme = "README.md"
+requires-python = ">=3.9,<3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Marco Oliveira"},
+]
+
+dependencies = [
+    "gymnasium==0.26.3",
+    "numpy==1.24.3",
+    "ray[rllib,data,tune]==2.5.0",
+    "torch==2.0.1",
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "python-dotenv>=1.0.0",
+    "jinja2>=3.1.0",
+]
+
+[project.scripts]
+plato = "plato_rl.cli:main"
+
+[project.urls]
+Repository = "https://github.com/your-username/plato-rl-azure"
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+plato_rl = ["templates/*.j2"]
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: marks tests that require Azure resources (deselect with '-m \"not integration\"')",
+]
