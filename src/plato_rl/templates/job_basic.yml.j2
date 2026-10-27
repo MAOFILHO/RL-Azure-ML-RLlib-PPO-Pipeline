@@ -1,0 +1,13 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+code: {{ code_path }}
+command: >-
+  python main.py
+environment: azureml:{{ environment_name }}@latest
+compute: azureml:{{ compute_name }}
+display_name: plato-basic-training
+experiment_name: plato-basic-training
+description: Train a PPO agent on SimpleAdder with trajectory logging.
+distribution:
+   type: mpi
+resources:
+  instance_count: {{ instance_count }}

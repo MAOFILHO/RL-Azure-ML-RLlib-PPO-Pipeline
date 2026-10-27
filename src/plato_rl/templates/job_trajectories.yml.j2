@@ -1,0 +1,18 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+code: {{ code_path }}
+command: >-
+  python main.py --storage-path {% raw %}${{outputs.output_data}}{% endraw %}
+environment: azureml:{{ environment_name }}@latest
+compute: azureml:{{ compute_name }}
+outputs:
+  output_data:
+    mode: rw_mount
+    path: azureml://datastores/workspaceblobstore/paths/trajectories
+    type: uri_folder
+display_name: plato-logging-trajectories
+experiment_name: plato-logging-trajectories
+description: Log episode trajectories to AML Datastore.
+distribution:
+   type: mpi
+resources:
+  instance_count: {{ instance_count }}

@@ -1,0 +1,15 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+code: {{ code_path }}
+command: >-
+  python mlflow_run.py --num-tune-samples {{ num_tune_samples }}
+environment: azureml:{{ environment_name }}@latest
+compute: azureml:{{ compute_name }}
+display_name: plato-hyperparameter-tuning
+experiment_name: plato-hyperparameter-tuning
+description: Hyperparameter tuning with Ray Tune.
+environment_variables:
+  PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+distribution:
+   type: mpi
+resources:
+  instance_count: {{ instance_count }}

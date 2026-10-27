@@ -1,0 +1,28 @@
+channels:
+- anaconda
+- conda-forge
+dependencies:
+- python=3.10.11
+- pip=23.0.1
+- setuptools<70
+- git
+- numpy=1.24.3
+- pandas=2.0.3
+- pip:
+   # Ray 2.5.0 requires pkg_resources which was removed in setuptools>=70
+   - setuptools<70
+   # Azure ML integration
+   - azureml-mlflow
+   - azureml-defaults
+   - ray-on-aml
+   # Ray ecosystem (click<8.2 needed to avoid Ray CLI deepcopy bug)
+   - click<8.2
+   - ray[data,rllib]==2.5.0
+   # ML framework
+   - torch==2.0.1
+   # RL environment
+   - gymnasium==0.26.3
+   # Experiment tracking (2.9.2 required for azureml-mlflow async_logging support)
+   - mlflow==2.9.2
+   - mlflow-skinny==2.9.2
+   - tensorboardX==2.2
